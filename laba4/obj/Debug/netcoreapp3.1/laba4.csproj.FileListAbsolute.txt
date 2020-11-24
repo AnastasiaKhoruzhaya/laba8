@@ -1,0 +1,11 @@
+D:\учеба\ООП\лаба 4\laba4\laba4\bin\Debug\netcoreapp3.1\laba4.exe
+D:\учеба\ООП\лаба 4\laba4\laba4\bin\Debug\netcoreapp3.1\laba4.deps.json
+D:\учеба\ООП\лаба 4\laba4\laba4\bin\Debug\netcoreapp3.1\laba4.runtimeconfig.json
+D:\учеба\ООП\лаба 4\laba4\laba4\bin\Debug\netcoreapp3.1\laba4.runtimeconfig.dev.json
+D:\учеба\ООП\лаба 4\laba4\laba4\bin\Debug\netcoreapp3.1\laba4.dll
+D:\учеба\ООП\лаба 4\laba4\laba4\bin\Debug\netcoreapp3.1\laba4.pdb
+D:\учеба\ООП\лаба 4\laba4\laba4\obj\Debug\netcoreapp3.1\laba4.csprojAssemblyReference.cache
+D:\учеба\ООП\лаба 4\laba4\laba4\obj\Debug\netcoreapp3.1\laba4.AssemblyInfoInputs.cache
+D:\учеба\ООП\лаба 4\laba4\laba4\obj\Debug\netcoreapp3.1\laba4.AssemblyInfo.cs
+D:\учеба\ООП\лаба 4\laba4\laba4\obj\Debug\netcoreapp3.1\laba4.dll
+D:\учеба\ООП\лаба 4\laba4\laba4\obj\Debug\netcoreapp3.1\laba4.pdb
