@@ -3,40 +3,67 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-/*
-1) Создать заданный в варианте класс. Определить в классе необходимые
-методы, конструкторы, индексаторы и заданные перегруженные
-операции. Написать программу тестирования, в которой проверяется
-использование перегруженных операций.
-2) Добавьте в свой класс вложенный объект Owner, который содержит Id,
-имя и организацию создателя. Проинициализируйте его
-3) Добавьте в свой класс вложенный класс Date (дата создания).
-Проинициализируйте
-4) Создайте статический класс StatisticOperation, содержащий 3 метода для
-работы с вашим классом (по варианту п.1): сумма, разница между
-максимальным и минимальным, подсчет количества элементов.
-5) Добавьте к классу StatisticOperation методы расширения для типа string
-и вашего типа из задания№1. См. задание по вариантам.*/
-
-/*
-Класс - список List. Дополнительно перегрузить следующие
-операции: 
-
-+ - добавить элемент (item+list); 
-— - удалить первый элемент из списка (--list); 
-!= - проверка на неравенство; 
-* - объединение двух списков.
-
-Методы расширения:
-1) Подсчет количества слов с заглавной буквы
-2) Проверка на повторяющиеся элементы в списке*/
+using System.Diagnostics;
+/*1. Создайте обобщенный интерфейс с операциями добавить, удалить,
+просмотреть.
+2. Возьмите за основу лабораторную № 4 «Перегрузка операций» и
+сделайте из нее обобщенный тип (класс) CollectionType<T>, в который
+вложите обобщённую коллекцию. Наследуйте в обобщенном классе интерфейс
+из п.1. Реализуйте необходимые методы. Добавьте обработку исключений c
+finally. Наложите какое-либо ограничение на обобщение.
+3. Проверьте использование обобщения для стандартных типов данных (в
+качестве стандартных типов использовать целые, вещественные и т.д.).
+Определить пользовательский класс, который будет использоваться в качестве
+параметра обобщения. Для пользовательского типа взять класс из лабораторной
+№5 «Наследование». 
+*/
 
 
 namespace ConsoleApp5
 {
     class Program
     {
-        class MyList
+        class ProductExceptions : Exception
+        {
+            public ProductExceptions(string message)
+            : base(message)
+            { }
+            public string message = "Products have lost their shelf life";
+            public string diagnostics = "Need to replace products";
+        }
+        class Product
+        {
+            public string name;
+            public int cost;
+
+            public Product(string n, int c)
+            {
+                name = n; cost = c;
+            }
+            public override string ToString()
+            {
+                return ("\nName: " + name + " Cost: " + cost);
+            }
+            private int age;
+            public int Age
+            {
+                get { return age; }
+                set
+                {
+                    if (value > 5)
+                        throw new ProductExceptions("Products have lost their shelf life");
+                    else
+                        age = value;
+                }
+            }
+        }
+        interface IList<T>
+        {
+            public void Add(T number);
+            public void Delete();
+            public void Output();
+        }
+        class MyList<T>: IList<T>
         {
             public class Owner//добавляем в класс вложеный объект Owner 
             {
@@ -46,54 +73,58 @@ namespace ConsoleApp5
             }
 
             public int number { get; set; }
-            public List<int> myLists;
+            public List<T> myLists;
 
             public MyList(int newNumber)
             {
-                Random rand = new Random((int)(DateTime.Now.Ticks));
                 number = newNumber;
-                myLists = new List<int>(number);//выделяем место списку под количество элементов number
-                for (int i = 0; i < number; i++)
-                    myLists.Add(rand.Next(0, 10));// инициализация списка
+                myLists = new List<T>(number);//выделяем место списку под количество элементов number
+            }
+
+            public void Add(T num)
+            {
+                ++number;
+                myLists.Add(num);
+            }
+            public void Delete()
+            {
+                number--;
+                myLists.RemoveAt(0);
+            }
+            public void Output()
+            {
+                foreach (T num in myLists)
+                    Console.Write(num + " ");
             }
 
             //перегрузка
-            public static bool operator !=(MyList list1, MyList list2)//!= - проверка на неравенство;
+            public static bool operator !=(MyList<T> list1, MyList<T> list2)//!= - проверка на неравенство;
             {
-                for (int i = 0; i < list1.myLists.Count; i++)
-                {
-                    for (int j = 0; j < list2.myLists.Count; j++)
-                        if (list1.myLists[i] == list2.myLists[i])
-                            return false;
-                }
+                if (list1.GetType() == list2.GetType())
+                    return false;
                 return true;
             }
-            public static bool operator ==(MyList list1, MyList list2)//!= - проверка на равенство;
+            public static bool operator ==(MyList<T> list1, MyList<T> list2)//!= - проверка на равенство;
             {
-                for (int i = 0; i < list1.myLists.Count; i++)
-                {
-                    for (int j = 0; j < list2.myLists.Count; j++)
-                        if (list1.myLists[i] == list2.myLists[i])
-                            return true;
-                }
+                if (list1.GetType() == list2.GetType())
+                    return true;
                 return false;
-
             }
-            public static MyList operator +(MyList list, int num)//+ - добавить элемент (item+list); 
+            public static MyList<T> operator +(MyList<T> list, T num)//+ - добавить элемент (item+list); 
             {
                 ++list.number;
                 list.myLists.Add(num);
                 return list;
             }
-            public static MyList operator --(MyList list)//— - удалить первый элемент из списка (--list); 
+            public static MyList<T> operator --(MyList<T> list)//— - удалить первый элемент из списка (--list); 
             {
                 list.number--;
                 list.myLists.RemoveAt(0);
                 return list;
             }
-            public static MyList operator *(MyList list1, MyList list2)//* - объединение двух списков.
+            public static MyList<T> operator *(MyList<T> list1, MyList<T> list2)//* - объединение двух списков.
             {
-                MyList resultList = new MyList(list1.number + list2.number);
+                MyList<T> resultList = new MyList<T>(list1.number + list2.number);
                 for (int i = 0; i < list1.number; i++)
                     resultList.myLists[i] = list1[i];
                 for (int i = 0; i < list2.number; i++)
@@ -101,7 +132,7 @@ namespace ConsoleApp5
                 return resultList;
             }
 
-            public int this[int i]//индексатор
+            public T this[int i]//индексатор
             {
                 get
                 {
@@ -114,46 +145,13 @@ namespace ConsoleApp5
             }
 
         }
-        class Date
+        static class StatisticOperation<T>
         {
-            public string dataTime()
-            {
-                DateTime now = DateTime.Now;
-                return ("Date: " + now.ToString("D"));
-            }
-        }
-        static class StatisticOperation
-        {
-            public static int Sum(MyList list)
-            {
-                return list.myLists.Sum();
-            }
-            public static int Quantity(MyList list)
+            public static int Quantity(MyList<T> list)
             {
                 return list.myLists.Count;
             }
-            public static int Difference(MyList list)
-            {
-                return list.myLists.Max() - list.myLists.Min();
-            }
-            public static int Str(string str)
-            {
-                string[] strArray = str.Split(' ');
-                int i = 0;
-                foreach (string st in strArray)
-                {
-                    foreach (char ch in st)
-                    {
-                        if (char.IsUpper(ch))
-                        {
-                            i++;
-                            break;
-                        }
-                    }
-                }
-                return i;
-            }
-            public static bool CheckTheSame(MyList list)
+            public static bool CheckTheSame(MyList<T> list)
             {
                 int counter = 0;
                 for (int i = 0; i < list.myLists.Count; i++)
@@ -170,71 +168,39 @@ namespace ConsoleApp5
         }
         static void Main(string[] args)
         {
-            MyList.Owner owner = new MyList.Owner();
-            owner.name = "Anastasia";
-            Console.WriteLine(owner.name);
+            MyList<int> listInt = new MyList<int>(5);
+            listInt.Add(3); listInt.Add(6); listInt.Add(1); listInt.Add(2); listInt.Add(4);
+            listInt.Output();
+            Console.WriteLine();
 
-            Date date = new Date();
-            Console.WriteLine(date.dataTime() + "\n");
+            MyList<string> listString = new MyList<string>(5);
+            listString.Add("help"); listString.Add("me"); listString.Add("please"); listString.Add("I'm"); listString.Add("dead");
+            listString.Output();
+            Console.WriteLine();
 
-            int number = 5;
-            MyList list = new MyList(number);
-            MyList list1 = new MyList(number);
+            Product product = new Product("apple", 100);
+            Product product2 = new Product("pen", 50);
 
-            Console.WriteLine("The first list is ");
-            for (int i = 0; i < number; i++)
+            MyList<Product> listProduct = new MyList<Product>(2);
+            listProduct.Add(product);
+            listProduct.Add(product2);
+            listProduct.Output();
+            Console.WriteLine();
+
+            try
             {
-                Console.Write(list[i] + " ");
+                Product receipt = new Product("ring",1000);
+                Console.Write("Enter age: ");
+                receipt.Age = Convert.ToInt32(Console.ReadLine());
+                Debug.Assert(receipt.Age >= 0);
             }
-            Console.WriteLine("\nIts sum is " + StatisticOperation.Sum(list) +
-                "\nThe diference between its elements is " + StatisticOperation.Difference(list) +
-                "\nIts quantity is " + StatisticOperation.Quantity(list) + "\n");
-
-            Console.WriteLine("\nThe second list is ");
-            for (int i = 0; i < number; i++)
+            catch (ProductExceptions ex)
             {
-                Console.Write(list1[i] + " ");
+                Console.WriteLine("Exception: " + ex.message);
+                Console.WriteLine("Diagnostics, how to avoid: " + ex.diagnostics);
             }
-            Console.WriteLine("\nIts sum is " + StatisticOperation.Sum(list1) +
-                "\nThe diference between its elements is " + StatisticOperation.Difference(list1) +
-                "\nIts quantity is " + StatisticOperation.Quantity(list1) + "\n");
-
-
-            Console.WriteLine("\n\nList1 == List2 ? The answer is " + (list == list1)
-                + "\n\nAfter the +operator ");
-            list += 1;
-            for (int i = 0; i < list.number; i++)
-            {
-                Console.Write(list[i] + " ");
-            }
-
-            Console.WriteLine("\n\nThe decriment of the list: ");
-            list--;
-            for (int i = 0; i < list.number; i++)
-            {
-                Console.Write(list[i] + " ");
-            }
-
-            Console.WriteLine("\n\nThe multiplication of two lists: ");
-            MyList rlist = list * list1;
-            for (int i = 0; i < rlist.number; i++)
-            {
-                Console.Write(rlist.myLists[i] + " ");
-            }
-
-            Console.WriteLine("\n\nChecking out the string operations: \nEnter the string");
-            string str = Console.ReadLine();
-            Console.WriteLine("There's " + StatisticOperation.Str(str) + " words with uppercase words");
-
-            Console.WriteLine("\nIs there any same elements in the 2 list?\n"
-            + StatisticOperation.CheckTheSame(list1));
-
-
 
             Console.ReadKey();
-
-
-
         }
     }
 }
